@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"runtime"
+	"strings"
 	"time"
 )
 
@@ -69,18 +71,18 @@ func (s *Server) Conn(conn net.Conn) {
 
 		ch := make(chan struct{}, 1)
 		ch <- struct{}{}
-		heart(conn, ch)
+		heartbeat(conn, ch)
 
-		//aaa, _ := Encode(fmt.Sprintf("goroutine, nums:%d, client: %s", runtime.NumGoroutine(), strings.Split(msg, ":")[1]))
-		//conn.Write(aaa)
+		send, _ := Encode(fmt.Sprintf("goroutine, nums:%d, client: %s", runtime.NumGoroutine(), strings.Split(msg, ":")[1]))
+		conn.Write(send)
 	}
 }
 
-func heart(conn net.Conn, ping chan struct{}) {
+func heartbeat(conn net.Conn, ping chan struct{}) {
 	select {
 	case <-ping:
 		fmt.Println("keep breathing")
-		conn.SetDeadline(time.Now().Add(time.Second * 1))
+		conn.SetDeadline(time.Now().Add(time.Second * 5))
 	case <-time.After(time.Second * 5):
 		fmt.Println("--------------")
 		conn.Close()

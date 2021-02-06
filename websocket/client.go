@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 var upgrader = websocket.Upgrader{
@@ -32,15 +34,23 @@ func (c *Client) read(server *Server) {
 		if err != nil {
 			break
 		}
-
 		fmt.Println(message)
+		hub(server, message)
 	}
-
 	unregister(c.id, server)
 }
 
-func (c *Client) hub(message []byte) {
-	GetClientById()
+func hub(server *Server, message []byte) {
+	msg := string(message)
+	id := strings.Split(msg, "$")[1]
+	otherId, _ := strconv.ParseInt(id, 10, 64)
+	other, err := GetClientById(otherId, server)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	other.send <- message
 }
 
 func (c *Client) write() {

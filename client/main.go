@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fancy/server"
 	"fmt"
 	"net"
@@ -23,17 +22,19 @@ func dial(num int) {
 		return
 	}
 
-		reader := bufio.NewReader(conn)
+	//reader := bufio.NewReader(conn)
 
 	for {
-		conn.Write(data)
-		time.Sleep(time.Second * 10)
-		s, err := server.Decode(reader)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-		fmt.Println("goroutine:", s)
+		_, err := conn.Write(data)
+		fmt.Println(err)
+		time.Sleep(time.Second * 5)
+		fmt.Println("goroutine:")
+		//s, err := server.Decode(reader)
+		//if err != nil {
+		//	fmt.Println(err)
+		//	continue
+		//}
+		//fmt.Println("goroutine:", s)
 	}
 
 }
